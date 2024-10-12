@@ -76,41 +76,33 @@ const updateLeavesPosition = useCallback(() => {
   setLeaves((prevLeaves) => {
     const updatedLeaves = prevLeaves.map((leaf) => ({
       ...leaf,
-      position: { 
-        ...leaf.position, 
+      position: {
+        ...leaf.position,
         y: leaf.position.y + (leaf.speed / 500) // Adjust denominator if necessary
       }
     }));
 
-    const leavesToRemove = [];
-    
-    updatedLeaves.forEach((leaf) => {
-      // Check if the leaf has reached the bottom of the screen
-      if (leaf.position.y > window.innerHeight) {
-        leavesToRemove.push(leaf.id); // Collect leaves to remove
-      }
+    // Collect leaves that have reached the bottom
+    const leavesToRemove = updatedLeaves.filter((leaf) => leaf.position.y > window.innerHeight);
+
+    // Handle removal of leaves after they reach the bottom
+    leavesToRemove.forEach((leaf) => {
+      setTimeout(() => {
+        setLeaves((currentLeaves) => currentLeaves.filter((l) => l.id !== leaf.id));
+      }, 2000); // Keep the leaf for 2 seconds at the bottom
     });
 
-    // Filter leaves to keep only those that haven't been caught or are still within bounds
-    const filteredLeaves = updatedLeaves.filter((leaf) => {
+    // Check for collisions with the bucket
+    return updatedLeaves.filter((leaf) => {
       // Check collision with the bucket
       if (detectCollision(leaf)) {
-        leavesToRemove.push(leaf.id); // Mark it for removal
         return false; // Remove leaf on catch
       }
       return true; // Keep leaf if not caught
     });
-
-    // Use a timeout to remove leaves that reached the bottom after 2 seconds
-    leavesToRemove.forEach((leafId) => {
-      setTimeout(() => {
-        setLeaves((currentLeaves) => currentLeaves.filter(leaf => leaf.id !== leafId));
-      }, 2000); // Adjust duration as needed
-    });
-
-    return filteredLeaves; // Return the filtered leaves for rendering
   });
 }, [detectCollision]);
+
 
 
 
