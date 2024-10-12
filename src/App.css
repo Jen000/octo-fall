@@ -25,12 +25,13 @@ h1 {
 /* Styles for the bucket */
 .bucket {
   position: absolute;
-  bottom: 10px;
+  bottom: 30px;
   width: 50px; /* Adjust width for smaller screens */
   height: 50px; /* Adjust height for smaller screens */
   background-size: contain; /* Ensure background image fits within */
   background-repeat: no-repeat; /* Prevent image from repeating */
   transition: left 0.1s; /* Smooth movement */
+  z-index: 10; /* Ensure bucket is on top */
 }
 
 /* Styles for falling leaves */
@@ -44,7 +45,7 @@ h1 {
   background-repeat: no-repeat; /* Prevent image from repeating */
   transition: top 0.5s linear; /* Transition for falling effect */
   pointer-events: none; /* Prevent mouse events on leaves */
-  z-index: 1;
+  z-index: 5;
 }
 
 /* Responsive styles */

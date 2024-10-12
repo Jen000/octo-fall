@@ -26,7 +26,7 @@ const Home = ({ onStart }) => {
         <h1 className="welcome">Welcome to the Leaf Catcher Game!</h1>
       )}
       <button className="start-button" onClick={handleStart}>
-        {countdown > 0 ? "Starting..." : "Start Game"}
+        {countdown > 0 ? "Start" : "Start Game"}
       </button>
     </div>
   );

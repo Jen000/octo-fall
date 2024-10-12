@@ -3,7 +3,7 @@ import React, { forwardRef } from 'react';
 const Bucket = forwardRef(({ color, position }, ref) => {
   // Map colors to image paths
   const bucketImages = {
-    brown: '/assets/brown-bucket.png',
+    brown: process.env.PUBLIC_URL + '/assets/brown-bucket.png',
   };
 
   return (
@@ -11,8 +11,8 @@ const Bucket = forwardRef(({ color, position }, ref) => {
       ref={ref} // Assign ref here
       style={{
         position: 'absolute',
-        bottom: '10px',
-        left: `${position}%`,
+        left: position.x,
+        top: position.y,
         width: '50px',
         height: '50px',
         backgroundImage: `url(${bucketImages[color]})`, // Set the background image

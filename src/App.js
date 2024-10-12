@@ -40,60 +40,81 @@ const App = () => {
     return { id: Date.now(), color, position: { x, y }, speed, caught: false };
   };
 
-  // Collision detection function
-  const detectCollision = useCallback((leaf) => {
-    const bucketElement = bucketRef.current; // Use the ref to access the bucket
-    if (!bucketElement) return false; // Return false if bucket element is not found
-  
-    const bucketRect = bucketElement.getBoundingClientRect();
-    const leafRect = {
-        left: leaf.position.x,
-        right: leaf.position.x + 20, // Assuming leaf width is 20
-        top: leaf.position.y,
-        bottom: leaf.position.y + 20 // Assuming leaf height is 20
-    };
-  
-    // Check for collision
-    const isCollision =
-        leafRect.right > bucketRect.left &&
-        leafRect.left < bucketRect.right &&
-        leafRect.bottom > bucketRect.top &&
-        leafRect.top < bucketRect.bottom;
-  
-    if (isCollision) {
-        // Update score based on the leaf color
-        setScore((prevScore) => prevScore + (leaf.color === 'green' ? -1 : leaf.color === 'red' ? 1 : leaf.color === 'yellow' ? 2 : 0));
-        return true; // Indicate that a collision occurred
-    }
-  
-    return false; // No collision
-  }, [bucketRef]);
+// Collision detection function
+const detectCollision = useCallback((leaf) => {
+  const bucketElement = bucketRef.current; // Use the ref to access the bucket
+  if (!bucketElement) return false; // Return false if bucket element is not found
+
+  const bucketRect = bucketElement.getBoundingClientRect();
+  const leafRect = {
+    left: leaf.position.x,
+    right: leaf.position.x + 20, // Assuming leaf width is 20
+    top: leaf.position.y,
+    bottom: leaf.position.y + 20 // Assuming leaf height is 20
+  };
+
+  // Check for collision
+  const isCollision =
+    leafRect.right > bucketRect.left &&
+    leafRect.left < bucketRect.right &&
+    leafRect.bottom >= bucketRect.top && // Allow for leaf to touch the top of the bucket
+    leafRect.top < bucketRect.bottom; // Ensure it is above the bottom of the bucket
+
+  if (isCollision) {
+    // Update score based on the leaf color
+    setScore((prevScore) => prevScore + (leaf.color === 'green' ? -1 : leaf.color === 'red' ? 1 : leaf.color === 'yellow' ? 2 : 0));
+    return true; // Indicate that a collision occurred
+  }
+
+  return false; // No collision
+}, [bucketRef]);
+
   
 
-  // Function to update leaf positions
-  const updateLeavesPosition = useCallback(() => {
-    setLeaves((prevLeaves) => {
-      const updatedLeaves = prevLeaves.map((leaf) => ({
-        ...leaf,
-        position: { 
-          ...leaf.position, 
-          y: leaf.position.y + (leaf.speed / 500) // Adjust denominator if necessary
-        }
-      }));
-  
-      // Check for collisions and filter leaves
-      return updatedLeaves.filter(leaf => {
-        if (leaf.position.y > window.innerHeight) {
-          return false; // Remove leaves that have fallen off the screen
-        }
-        // Check collision with the bucket
-        if (detectCollision(leaf)) {
-          return false; // Remove leaf on catch
-        }
-        return true; // Keep leaf if not caught
-      });
+// Function to update leaf positions
+const updateLeavesPosition = useCallback(() => {
+  setLeaves((prevLeaves) => {
+    const updatedLeaves = prevLeaves.map((leaf) => ({
+      ...leaf,
+      position: { 
+        ...leaf.position, 
+        y: leaf.position.y + (leaf.speed / 500) // Adjust denominator if necessary
+      }
+    }));
+
+    const leavesToRemove = [];
+    
+    updatedLeaves.forEach((leaf) => {
+      // Check if the leaf has reached the bottom of the screen
+      if (leaf.position.y > window.innerHeight) {
+        leavesToRemove.push(leaf.id); // Collect leaves to remove
+      }
     });
-  }, [detectCollision]);
+
+    // Filter leaves to keep only those that haven't been caught or are still within bounds
+    const filteredLeaves = updatedLeaves.filter((leaf) => {
+      // Check collision with the bucket
+      if (detectCollision(leaf)) {
+        leavesToRemove.push(leaf.id); // Mark it for removal
+        return false; // Remove leaf on catch
+      }
+      return true; // Keep leaf if not caught
+    });
+
+    // Use a timeout to remove leaves that reached the bottom after 2 seconds
+    leavesToRemove.forEach((leafId) => {
+      setTimeout(() => {
+        setLeaves((currentLeaves) => currentLeaves.filter(leaf => leaf.id !== leafId));
+      }, 2000); // Adjust duration as needed
+    });
+
+    return filteredLeaves; // Return the filtered leaves for rendering
+  });
+}, [detectCollision]);
+
+
+
+
   
 
   // Generate leaves periodically
@@ -113,20 +134,24 @@ const App = () => {
     return () => clearInterval(interval);
   }, [updateLeavesPosition]);
 
-  // Function to set bucket position based on the mouse or touch position
-  const setBucketPositionFromEvent = (event) => {
-    const screenWidth = window.innerWidth;
-    const bucketWidth = 50; // Assuming the width of the bucket is 50px
-    const offsetX = event.clientX || (event.touches[0].clientX); // Get mouse or touch position
+// Function to set bucket position based on the mouse or touch position
+const setBucketPositionFromEvent = (event) => {
+  const bucketWidth = 50; // Assuming the width of the bucket is 50px
+  const offsetX = event.clientX || (event.touches[0].clientX); // Get mouse or touch position
+  const offsetY = event.clientY || (event.touches[0].clientY); // Get vertical position
 
-    // Calculate new position based on cursor/touch position
-    let newPosition = (offsetX / screenWidth) * 100; // Convert to percentage
-
-    // Ensure the bucket does not go outside the bounds
-    newPosition = Math.max(0, Math.min(100 - (bucketWidth / screenWidth * 100), newPosition));
-
-    setBucketPosition(newPosition);
+  // Calculate new position based on cursor/touch position
+  let newPosition = {
+      x: offsetX - bucketWidth / 2, // Center the bucket under the cursor
+      y: offsetY - bucketWidth / 2, // Center the bucket vertically
   };
+
+  // Ensure the bucket does not go outside the bounds of the screen
+  newPosition.x = Math.max(0, Math.min(window.innerWidth - bucketWidth, newPosition.x));
+  newPosition.y = Math.max(0, Math.min(window.innerHeight - bucketWidth, newPosition.y));
+
+  setBucketPosition(newPosition);
+};
 
   // Mouse move event for desktop
   const handleMouseMove = useCallback((event) => {
@@ -158,21 +183,27 @@ const App = () => {
       setScore(0);
     };
 
-  return (
-    <div className="game-container">
-      {isGameStarted ? (
-        <>
-          <h1>Score: {score}</h1>
-          <Bucket ref={bucketRef} color="brown" position={bucketPosition} />
-          {leaves.map((leaf) => (
-            <Leaf key={leaf.id} color={leaf.color} position={{ x: leaf.position.x, y: leaf.position.y }} />
-          ))}
-        </>
-      ) : (
-        <Home onStart={startGame} />
-      )}
-    </div>
+
+    return (
+      <div className="game-container">
+          {isGameStarted ? (
+              <>
+                  <h1>Score: {score}</h1>
+                  <Bucket
+                      ref={bucketRef}
+                      color="brown"
+                      position={bucketPosition} // Pass the new position as an object
+                  />
+                  {leaves.map((leaf) => (
+                      <Leaf key={leaf.id} color={leaf.color} position={{ x: leaf.position.x, y: leaf.position.y }} />
+                  ))}
+              </>
+          ) : (
+              <Home onStart={startGame} />
+          )}
+      </div>
   );
 };
+
 
 export default App;
