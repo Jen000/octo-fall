@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/octo-fall/static/css/main.4487c2fc.css",
-    "main.js": "/octo-fall/static/js/main.6644efd7.js",
-    "static/js/453.e0f1b597.chunk.js": "/octo-fall/static/js/453.e0f1b597.chunk.js",
+    "main.css": "/octo-fall/static/css/main.64b0d824.css",
+    "main.js": "/octo-fall/static/js/main.dd9b6aff.js",
+    "static/js/453.783475b2.chunk.js": "/octo-fall/static/js/453.783475b2.chunk.js",
     "static/media/orange-trees-background.jpg": "/octo-fall/static/media/orange-trees-background.0c47c4f9d8cadeb56dc6.jpg",
     "index.html": "/octo-fall/index.html",
-    "main.4487c2fc.css.map": "/octo-fall/static/css/main.4487c2fc.css.map",
-    "main.6644efd7.js.map": "/octo-fall/static/js/main.6644efd7.js.map",
-    "453.e0f1b597.chunk.js.map": "/octo-fall/static/js/453.e0f1b597.chunk.js.map"
+    "main.64b0d824.css.map": "/octo-fall/static/css/main.64b0d824.css.map",
+    "main.dd9b6aff.js.map": "/octo-fall/static/js/main.dd9b6aff.js.map",
+    "453.783475b2.chunk.js.map": "/octo-fall/static/js/453.783475b2.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.4487c2fc.css",
-    "static/js/main.6644efd7.js"
+    "static/css/main.64b0d824.css",
+    "static/js/main.dd9b6aff.js"
   ]
 }
