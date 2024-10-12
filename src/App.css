@@ -1,5 +1,17 @@
 /* App.css */
 
+/* Make sure the body takes up the full height of the viewport */
+body, html {
+  margin: 0;            /* Remove default margin */
+  padding: 0;           /* Remove default padding */
+  height: 100%;         /* Ensure full height */
+  overflow: hidden;     /* Prevent scrolling */
+}
+
+html {
+  touch-action: none; /* Prevent scrolling on touch devices */
+}
+
 /* Base styles for the game container */
 .game-container {
   background-image: url('../public/assets/orange-trees-background.jpg');

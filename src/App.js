@@ -15,6 +15,7 @@ const App = () => {
   const generateLeaf = () => {
     const x = Math.random() * window.innerWidth; // Random horizontal position
     const y = 0; // Start at the top
+    const size = 5; // Size in vw
 
     // Determine leaf color based on frequency
     let color;
@@ -37,7 +38,7 @@ const App = () => {
       speed = Math.random() * 500 + 1000; // Speed between 500 + 1000ms
     }
 
-    return { id: Date.now(), color, position: { x, y }, speed, caught: false };
+    return { id: Date.now(), color, position: { x, y }, size, speed, caught: false };
   };
 
 // Collision detection function
@@ -46,12 +47,15 @@ const detectCollision = useCallback((leaf) => {
   if (!bucketElement) return false; // Return false if bucket element is not found
 
   const bucketRect = bucketElement.getBoundingClientRect();
+
+
   const leafRect = {
     left: leaf.position.x,
-    right: leaf.position.x + 20, // Assuming leaf width is 20
+    right: leaf.position.x + (leaf.size * window.innerWidth / 100), // Convert vw to pixels
     top: leaf.position.y,
-    bottom: leaf.position.y + 20 // Assuming leaf height is 20
+    bottom: leaf.position.y + (leaf.size * window.innerWidth / 100) // Convert vw to pixels
   };
+
 
   // Check for collision
   const isCollision =
