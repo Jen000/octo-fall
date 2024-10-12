@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/octo-fall/static/css/main.4487c2fc.css",
+    "main.js": "/octo-fall/static/js/main.6644efd7.js",
+    "static/js/453.e0f1b597.chunk.js": "/octo-fall/static/js/453.e0f1b597.chunk.js",
+    "static/media/orange-trees-background.jpg": "/octo-fall/static/media/orange-trees-background.0c47c4f9d8cadeb56dc6.jpg",
+    "index.html": "/octo-fall/index.html",
+    "main.4487c2fc.css.map": "/octo-fall/static/css/main.4487c2fc.css.map",
+    "main.6644efd7.js.map": "/octo-fall/static/js/main.6644efd7.js.map",
+    "453.e0f1b597.chunk.js.map": "/octo-fall/static/js/453.e0f1b597.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4487c2fc.css",
+    "static/js/main.6644efd7.js"
+  ]
+}
