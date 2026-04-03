@@ -6,32 +6,41 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  gap: 24px;
+  gap: 20px;
   background-image: url('../../public/assets/orange-trees-background.jpg');
   background-size: cover;
   background-position: center;
 }
 
-/* Countdown */
+/* ── Countdown screen ── */
+.get-ready {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: white;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  margin: 0;
+}
+
 .countdown {
   font-family: 'Playfair Display', serif;
-  font-size: 8rem;
+  font-size: 9rem;
   color: white;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  text-shadow: 0 4px 24px rgba(0,0,0,0.45);
   margin: 0;
-  animation: pulse 0.6s ease-in-out;
+  /* Re-triggers animation each time key changes */
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.7); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+@keyframes popIn {
+  0%   { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
 }
 
-/* Title */
+/* ── Welcome screen ── */
 .title-block {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .game-title {
@@ -45,73 +54,71 @@
 }
 
 .title-leaf {
-  font-size: 2.5rem;
-  animation: sway 3s ease-in-out infinite alternate;
+  font-size: 2.4rem;
   display: inline-block;
+  animation: sway 3s ease-in-out infinite alternate;
 }
-
-.title-leaf:last-child {
-  animation-delay: 1.5s;
-}
+.title-leaf:last-child { animation-delay: 1.5s; }
 
 @keyframes sway {
-  from { transform: rotate(-12deg); }
-  to   { transform: rotate(12deg); }
+  from { transform: rotate(-14deg); }
+  to   { transform: rotate(14deg); }
 }
 
-/* Rules card */
+.welcome-sub {
+  font-family: 'Lato', sans-serif;
+  font-size: 1rem;
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+  margin: 0;
+}
+
+/* ── Rules card ── */
 .rules-card {
   background: rgba(255, 248, 235, 0.88);
   backdrop-filter: blur(8px);
   border-radius: 20px;
-  padding: 28px 36px;
-  width: min(420px, 90vw);
+  padding: 24px 32px;
+  width: min(420px, 88vw);
   box-shadow: 0 8px 32px rgba(100, 40, 0, 0.25);
   border: 2px solid rgba(210, 120, 30, 0.35);
 }
 
 .rules-heading {
   font-family: 'Playfair Display', serif;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   color: #7a3500;
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
   text-align: center;
 }
 
 .rules-sub {
   font-family: 'Lato', sans-serif;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: #8b5a2b;
   text-align: center;
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
 }
 
-/* Individual leaf rules */
 .leaf-rules {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .leaf-rule {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: rgba(255, 237, 200, 0.6);
+  background: rgba(255, 237, 200, 0.65);
   border-radius: 12px;
   padding: 10px 14px;
   border: 1px solid rgba(210, 140, 50, 0.3);
   transition: transform 0.15s ease;
 }
+.leaf-rule:hover { transform: translateX(5px); }
 
-.leaf-rule:hover {
-  transform: translateX(4px);
-}
-
-.leaf-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
+.leaf-icon { font-size: 1.9rem; flex-shrink: 0; }
 
 .leaf-info {
   display: flex;
@@ -122,38 +129,32 @@
 .leaf-label {
   font-family: 'Lato', sans-serif;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: #5a2d00;
 }
 
 .leaf-points {
   font-family: 'Lato', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #2e7d32;
 }
-
-.leaf-points.penalty {
-  color: #c62828;
-}
-
-.leaf-points.bonus {
-  color: #e65100;
-}
+.leaf-points.penalty { color: #c62828; }
+.leaf-points.bonus   { color: #e65100; }
 
 .leaf-tip {
   font-family: 'Lato', sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: #a0673a;
   font-style: italic;
   flex-shrink: 0;
 }
 
-/* Start button */
+/* ── Start button ── */
 .start-button {
-  padding: 14px 48px;
+  padding: 14px 52px;
   font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
   background: linear-gradient(135deg, #e65c00, #d4380d);
   color: white;
@@ -164,23 +165,15 @@
   box-shadow: 0 4px 18px rgba(200, 60, 0, 0.45);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-
 .start-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(200, 60, 0, 0.55);
 }
+.start-button:active { transform: translateY(1px); }
 
-.start-button:active {
-  transform: translateY(1px);
-}
-
-/* Responsive */
+/* ── Responsive ── */
 @media (max-width: 480px) {
-  .game-title {
-    font-size: 2.4rem;
-  }
-
-  .rules-card {
-    padding: 20px 20px;
-  }
+  .game-title  { font-size: 2.4rem; }
+  .rules-card  { padding: 18px 18px; }
+  .countdown   { font-size: 7rem; }
 }
