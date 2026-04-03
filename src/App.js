@@ -4,202 +4,167 @@ import Bucket from './components/Bucket';
 import Home from './components/Home';
 import './App.css';
 
+const BUCKET_SIZE = 50;
+
 const App = () => {
-  const [isGameStarted, setIsGameStarted] = useState(false); // New state variable for game status
+  const [isGameStarted, setIsGameStarted] = useState(false);
   const [leaves, setLeaves] = useState([]);
   const [score, setScore] = useState(0);
-  const [bucketPosition, setBucketPosition] = useState(50); // Start in the middle (percentage)
-  const bucketRef = useRef(null); // Create a ref for the bucket
+  // FIX: Initialize as an object {x, y}, not a number (50).
+  // Previously, bucketPosition started as 50 (a number), then got set to {x, y}
+  // on first mouse move — causing a crash/flash on game start.
+  const [bucketPosition, setBucketPosition] = useState({
+    x: window.innerWidth / 2 - BUCKET_SIZE / 2,
+    y: window.innerHeight - BUCKET_SIZE - 30,
+  });
+  const bucketRef = useRef(null);
 
-  // Function to generate random leaves
   const generateLeaf = () => {
-    const x = Math.random() * window.innerWidth; // Random horizontal position
-    const y = 0; // Start at the top
-    const size = 5; // Size in vw
+    const x = Math.random() * (window.innerWidth - 50);
+    const y = 0;
+    const size = 5; // vw
 
-    // Determine leaf color based on frequency
     let color;
     const randomValue = Math.random();
     if (randomValue < 0.5) {
-      color = 'green'; // 50% chance
+      color = 'green';
     } else if (randomValue < 0.8) {
-      color = 'red'; // 30% chance
+      color = 'red';
     } else {
-      color = 'yellow'; // 20% chance
+      color = 'yellow';
     }
 
-    // Set speed based on color
+    // FIX: speed is now pixels-per-frame (called every 16ms), not milliseconds.
+    // Previously speed was e.g. 2000–3500 and divided by 500, giving 4–7px/frame
+    // for yellow — way too fast and inconsistent. Now speed is a clean px/frame value.
     let speed;
     if (color === 'yellow') {
-      speed = Math.random() * 1500 + 2000; // Speed between 1500 + 2000ms
+      speed = 1.5 + Math.random() * 1; // 1.5–2.5 px/frame (slowest, worth 2pts)
     } else if (color === 'red') {
-      speed = Math.random() * 1000 + 1500; // Speed between 1500ms and 2500ms
+      speed = 2.5 + Math.random() * 1.5; // 2.5–4 px/frame
     } else {
-      speed = Math.random() * 500 + 1000; // Speed between 500 + 1000ms
+      speed = 3.5 + Math.random() * 2; // 3.5–5.5 px/frame (fastest, penalizes)
     }
 
-    return { id: Date.now(), color, position: { x, y }, size, speed, caught: false };
+    return { id: Date.now() + Math.random(), color, position: { x, y }, size, speed, caught: false };
   };
 
-// Collision detection function
-const detectCollision = useCallback((leaf) => {
-  const bucketElement = bucketRef.current; // Use the ref to access the bucket
-  if (!bucketElement) return false; // Return false if bucket element is not found
+  const detectCollision = useCallback((leaf) => {
+    const bucketElement = bucketRef.current;
+    if (!bucketElement) return false;
 
-  const bucketRect = bucketElement.getBoundingClientRect();
+    const bucketRect = bucketElement.getBoundingClientRect();
+    const leafSizePx = leaf.size * window.innerWidth / 100;
 
+    const leafRect = {
+      left: leaf.position.x,
+      right: leaf.position.x + leafSizePx,
+      top: leaf.position.y,
+      bottom: leaf.position.y + leafSizePx,
+    };
 
-  const leafRect = {
-    left: leaf.position.x,
-    right: leaf.position.x + (leaf.size * window.innerWidth / 100), // Convert vw to pixels
-    top: leaf.position.y,
-    bottom: leaf.position.y + (leaf.size * window.innerWidth / 100) // Convert vw to pixels
-  };
+    const isCollision =
+      leafRect.right > bucketRect.left &&
+      leafRect.left < bucketRect.right &&
+      leafRect.bottom >= bucketRect.top &&
+      leafRect.top < bucketRect.bottom;
 
+    if (isCollision) {
+      setScore((prevScore) =>
+        prevScore + (leaf.color === 'green' ? -1 : leaf.color === 'red' ? 1 : 2)
+      );
+      return true;
+    }
+    return false;
+  }, []);
 
-  // Check for collision
-  const isCollision =
-    leafRect.right > bucketRect.left &&
-    leafRect.left < bucketRect.right &&
-    leafRect.bottom >= bucketRect.top && // Allow for leaf to touch the top of the bucket
-    leafRect.top < bucketRect.bottom; // Ensure it is above the bottom of the bucket
-
-  if (isCollision) {
-    // Update score based on the leaf color
-    setScore((prevScore) => prevScore + (leaf.color === 'green' ? -1 : leaf.color === 'red' ? 1 : leaf.color === 'yellow' ? 2 : 0));
-    return true; // Indicate that a collision occurred
-  }
-
-  return false; // No collision
-}, [bucketRef]);
-
-  
-
-// Function to update leaf positions
-const updateLeavesPosition = useCallback(() => {
-  setLeaves((prevLeaves) => {
-    const updatedLeaves = prevLeaves.map((leaf) => ({
-      ...leaf,
-      position: {
-        ...leaf.position,
-        y: leaf.position.y + (leaf.speed / 500) // Adjust denominator if necessary
-      }
-    }));
-
-    // Collect leaves that have reached the bottom
-    const leavesToRemove = updatedLeaves.filter((leaf) => leaf.position.y > window.innerHeight);
-
-    // Handle removal of leaves after they reach the bottom
-    leavesToRemove.forEach((leaf) => {
-      setTimeout(() => {
-        setLeaves((currentLeaves) => currentLeaves.filter((l) => l.id !== leaf.id));
-      }, 2000); // Keep the leaf for 2 seconds at the bottom
+  const updateLeavesPosition = useCallback(() => {
+    setLeaves((prevLeaves) => {
+      return prevLeaves
+        .map((leaf) => ({
+          ...leaf,
+          position: {
+            ...leaf.position,
+            // FIX: speed is now a direct px/frame value — simple and predictable
+            y: leaf.position.y + leaf.speed,
+          },
+        }))
+        .filter((leaf) => {
+          if (detectCollision(leaf)) return false; // caught
+          if (leaf.position.y > window.innerHeight) return false; // off screen
+          return true;
+        });
     });
-
-    // Check for collisions with the bucket
-    return updatedLeaves.filter((leaf) => {
-      // Check collision with the bucket
-      if (detectCollision(leaf)) {
-        return false; // Remove leaf on catch
-      }
-      return true; // Keep leaf if not caught
-    });
-  });
-}, [detectCollision]);
-
-
-
-
-
-  
+  }, [detectCollision]);
 
   // Generate leaves periodically
   useEffect(() => {
+    if (!isGameStarted) return;
     const interval = setInterval(() => {
-      if (Math.random() < 0.7) { // 70% chance to generate a leaf
+      if (Math.random() < 0.7) {
         setLeaves((prevLeaves) => [...prevLeaves, generateLeaf()]);
       }
-    }, 1000); // Check every second
-
+    }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isGameStarted]);
 
-  // Update leaf positions every 16ms (approximately every frame)
+  // Update leaf positions every ~16ms
   useEffect(() => {
+    if (!isGameStarted) return;
     const interval = setInterval(updateLeavesPosition, 16);
     return () => clearInterval(interval);
-  }, [updateLeavesPosition]);
+  }, [updateLeavesPosition, isGameStarted]);
 
-// Function to set bucket position based on the mouse or touch position
-const setBucketPositionFromEvent = (event) => {
-  const bucketWidth = 50; // Assuming the width of the bucket is 50px
-  const offsetX = event.clientX || (event.touches[0].clientX); // Get mouse or touch position
-  const offsetY = event.clientY || (event.touches[0].clientY); // Get vertical position
+  const setBucketPositionFromEvent = useCallback((event) => {
+    const offsetX = event.clientX ?? event.touches?.[0]?.clientX;
+    const offsetY = event.clientY ?? event.touches?.[0]?.clientY;
+    if (offsetX == null) return;
 
-  // Calculate new position based on cursor/touch position
-  let newPosition = {
-      x: offsetX - bucketWidth / 2, // Center the bucket under the cursor
-      y: offsetY - bucketWidth / 2, // Center the bucket vertically
-  };
+    const newX = Math.max(0, Math.min(window.innerWidth - BUCKET_SIZE, offsetX - BUCKET_SIZE / 2));
+    const newY = Math.max(0, Math.min(window.innerHeight - BUCKET_SIZE, offsetY - BUCKET_SIZE / 2));
 
-  // Ensure the bucket does not go outside the bounds of the screen
-  newPosition.x = Math.max(0, Math.min(window.innerWidth - bucketWidth, newPosition.x));
-  newPosition.y = Math.max(0, Math.min(window.innerHeight - bucketWidth, newPosition.y));
+    setBucketPosition({ x: newX, y: newY });
+  }, []);
 
-  setBucketPosition(newPosition);
-};
-
-  // Mouse move event for desktop
   const handleMouseMove = useCallback((event) => {
     setBucketPositionFromEvent(event);
-  }, []);
+  }, [setBucketPositionFromEvent]);
 
-  // Touch move event for mobile
   const handleTouchMove = useCallback((event) => {
     setBucketPositionFromEvent(event);
-    event.preventDefault(); // Prevent scrolling
-  }, []);
+    event.preventDefault();
+  }, [setBucketPositionFromEvent]);
 
-  // Add event listeners for mouse and touch
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('touchmove', handleTouchMove);
-
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
     };
   }, [handleMouseMove, handleTouchMove]);
 
+  const startGame = () => {
+    setIsGameStarted(true);
+    setLeaves([]);
+    setScore(0);
+  };
 
-    // Function to start the game
-    const startGame = () => {
-      setIsGameStarted(true); // Set game started to true
-      setLeaves([]); // Reset leaves and score
-      setScore(0);
-    };
-
-
-    return (
-      <div className="game-container">
-          {isGameStarted ? (
-              <>
-                  <h1>Score: {score}</h1>
-                  <Bucket
-                      ref={bucketRef}
-                      color="brown"
-                      position={bucketPosition} // Pass the new position as an object
-                  />
-                  {leaves.map((leaf) => (
-                      <Leaf key={leaf.id} color={leaf.color} position={{ x: leaf.position.x, y: leaf.position.y }} />
-                  ))}
-              </>
-          ) : (
-              <Home onStart={startGame} />
-          )}
-      </div>
+  return (
+    <div className="game-container">
+      {isGameStarted ? (
+        <>
+          <h1>Score: {score}</h1>
+          <Bucket ref={bucketRef} color="brown" position={bucketPosition} />
+          {leaves.map((leaf) => (
+            <Leaf key={leaf.id} color={leaf.color} position={leaf.position} />
+          ))}
+        </>
+      ) : (
+        <Home onStart={startGame} />
+      )}
+    </div>
   );
 };
-
 
 export default App;

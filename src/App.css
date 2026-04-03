@@ -1,29 +1,26 @@
 /* App.css */
 
-/* Make sure the body takes up the full height of the viewport */
 body, html {
-  margin: 0;            /* Remove default margin */
-  padding: 0;           /* Remove default padding */
-  height: 100%;         /* Ensure full height */
-  overflow: hidden;     /* Prevent scrolling */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 html {
-  touch-action: none; /* Prevent scrolling on touch devices */
+  touch-action: none;
 }
 
-/* Base styles for the game container */
 .game-container {
   background-image: url('../public/assets/orange-trees-background.jpg');
-  background-size: cover; /* Cover the container */
-  background-position: center; /* Center the image */
-  width: 100vw; /* Full width of the viewport */
-  height: 100vh; /* Full height of the viewport */
+  background-size: cover;
+  background-position: center;
+  width: 100vw;
+  height: 100vh;
   position: relative;
   overflow: hidden;
 }
 
-/* Score display styles */
 h1 {
   color: white;
   text-align: center;
@@ -34,66 +31,63 @@ h1 {
   font-family: 'Arial', sans-serif;
 }
 
-/* Styles for the bucket */
 .bucket {
   position: absolute;
-  bottom: 30px;
-  width: 50px; /* Adjust width for smaller screens */
-  height: 50px; /* Adjust height for smaller screens */
-  background-size: contain; /* Ensure background image fits within */
-  background-repeat: no-repeat; /* Prevent image from repeating */
-  transition: left 0.1s; /* Smooth movement */
-  z-index: 10; /* Ensure bucket is on top */
+  width: 50px;
+  height: 50px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  /* FIX: Removed transition: left 0.1s — it made the bucket lag behind the cursor.
+     With JS updating position every 16ms, CSS transitions only add jank. */
+  z-index: 10;
+  will-change: transform; /* hint to browser for smoother compositing */
 }
 
-/* Styles for falling leaves */
 .leaf {
   position: absolute;
-  width: 5vw; /* Dynamic width based on viewport */
-  height: 5vw; /* Dynamic height based on viewport */
-  max-width: 50px; /* Prevent leaves from getting too large */
-  max-height: 50px; /* Prevent leaves from getting too large */
-  background-size: contain; /* Ensure background image fits within */
-  background-repeat: no-repeat; /* Prevent image from repeating */
-  transition: top 0.5s linear; /* Transition for falling effect */
-  pointer-events: none; /* Prevent mouse events on leaves */
+  width: 5vw;
+  height: 5vw;
+  max-width: 50px;
+  max-height: 50px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  /* FIX: Removed transition: top 0.5s linear — this was the main cause of leaf glitching.
+     JS updates top every 16ms; a 500ms CSS transition constantly restarts and
+     causes leaves to rubber-band, stutter, and jump. Plain JS positioning is smooth. */
+  pointer-events: none;
   z-index: 5;
+  will-change: top, left;
 }
 
-/* Responsive styles */
-@media (max-width: 768px) { /* For tablets and mobile devices */
-  .game-container {
-    height: 100vh; /* Full height for small screens */
-  }
-
+@media (max-width: 768px) {
   h1 {
-    font-size: 1.5rem; /* Smaller font size for the score */
-    top: 10px; /* Adjust positioning for smaller screens */
+    font-size: 1.5rem;
+    top: 10px;
   }
 
   .bucket {
-    width: 40px; /* Smaller bucket width */
-    height: 40px; /* Smaller bucket height */
+    width: 40px;
+    height: 40px;
   }
 
   .leaf {
-    width: 10vw; /* Increase size on smaller screens */
-    height: 10vw; /* Increase size on smaller screens */
+    width: 10vw;
+    height: 10vw;
   }
 }
 
-@media (max-width: 480px) { /* For phones */
+@media (max-width: 480px) {
   h1 {
-    font-size: 1.2rem; /* Even smaller font size for phones */
+    font-size: 1.2rem;
   }
 
   .bucket {
-    width: 30px; /* Further reduce bucket size */
-    height: 30px; /* Further reduce bucket size */
+    width: 30px;
+    height: 30px;
   }
 
   .leaf {
-    width: 15vw; /* Further increase size on mobile */
-    height: 15vw; /* Further increase size on mobile */
+    width: 15vw;
+    height: 15vw;
   }
 }
