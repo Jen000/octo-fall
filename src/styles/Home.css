@@ -1,38 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@400;700&display=swap');
+
 .home-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #ffeb3b; /* Light background color for fall */
-    background-image: url('../../public/assets/orange-trees-background.jpg');
-    background-size: cover;
-    background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  gap: 24px;
+  background-image: url('../../public/assets/orange-trees-background.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Countdown */
+.countdown {
+  font-family: 'Playfair Display', serif;
+  font-size: 8rem;
+  color: white;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  margin: 0;
+  animation: pulse 0.6s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Title */
+.title-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 3px 16px rgba(0,0,0,0.45);
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.title-leaf {
+  font-size: 2.5rem;
+  animation: sway 3s ease-in-out infinite alternate;
+  display: inline-block;
+}
+
+.title-leaf:last-child {
+  animation-delay: 1.5s;
+}
+
+@keyframes sway {
+  from { transform: rotate(-12deg); }
+  to   { transform: rotate(12deg); }
+}
+
+/* Rules card */
+.rules-card {
+  background: rgba(255, 248, 235, 0.88);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  padding: 28px 36px;
+  width: min(420px, 90vw);
+  box-shadow: 0 8px 32px rgba(100, 40, 0, 0.25);
+  border: 2px solid rgba(210, 120, 30, 0.35);
+}
+
+.rules-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: #7a3500;
+  margin: 0 0 6px 0;
+  text-align: center;
+}
+
+.rules-sub {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.88rem;
+  color: #8b5a2b;
+  text-align: center;
+  margin: 0 0 20px 0;
+}
+
+/* Individual leaf rules */
+.leaf-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.leaf-rule {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 237, 200, 0.6);
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(210, 140, 50, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.leaf-rule:hover {
+  transform: translateX(4px);
+}
+
+.leaf-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.leaf-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.leaf-label {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #5a2d00;
+}
+
+.leaf-points {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.leaf-points.penalty {
+  color: #c62828;
+}
+
+.leaf-points.bonus {
+  color: #e65100;
+}
+
+.leaf-tip {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.78rem;
+  color: #a0673a;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+/* Start button */
+.start-button {
+  padding: 14px 48px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #e65c00, #d4380d);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 18px rgba(200, 60, 0, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200, 60, 0, 0.55);
+}
+
+.start-button:active {
+  transform: translateY(1px);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .game-title {
+    font-size: 2.4rem;
   }
-  
-  .countdown {
-    font-size: 5rem;
-    color: darkorange;
+
+  .rules-card {
+    padding: 20px 20px;
   }
-  
-  .welcome {
-    font-size: 2rem;
-    color: brown;
-  }
-  
-  .start-button {
-    padding: 10px 20px;
-    font-size: 1.5rem;
-    background-color: orange;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.3s;
-  }
-  
-  .start-button:hover {
-    background-color: darkorange;
-  }
-  
+}
